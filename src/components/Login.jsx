@@ -22,6 +22,7 @@ const Login = () => {
             localStorage.setItem("token", token);
             localStorage.setItem("userRole", user.role);
             localStorage.setItem("userName", user.name);
+            localStorage.setItem("userid", user.id);
 
             navigate("/admindashboard");
         } catch (err) {

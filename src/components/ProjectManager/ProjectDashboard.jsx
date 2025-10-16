@@ -187,7 +187,7 @@ const ProjectDashboard = () => {
                                                     project.users.slice(0, 3).map((user) => (
                                                         <img
                                                             key={user.id}
-                                                            src={`${BASE_URL}/uploads/${user.image}` || proimg}
+                                                            src={`${BASE_URL}/${user.image}` || proimg}
                                                             className="w-10 h-10 rounded-full object-cover border-2 border-white"
                                                             alt={user.name}
                                                         />

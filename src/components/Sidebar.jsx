@@ -2,6 +2,7 @@ import React from "react";
 import { Home, Users, BarChart, Settings, LogOut, X} from "lucide-react";
 import { LuFileText } from "react-icons/lu";
 import { NavLink, useNavigate } from "react-router-dom";
+import { MdOutlineContacts } from "react-icons/md";
 
 export default function Sidebar({ open, setOpen }) {
   const navigate = useNavigate();
@@ -10,8 +11,8 @@ export default function Sidebar({ open, setOpen }) {
     { name: "Home", icon: <Home size={20} />, path: "/home" },
     { name: "AdminDashboard", icon: <Home size={20} />, path: "/admindashboard" },
     { name: "Projects", icon: <LuFileText size={20} />, path: "/projectdashboard" },
-    { name: "Reports", icon: <BarChart size={20} />, path: "/reports" },
-    { name: "Settings", icon: <Settings size={20} />, path: "/settings" },
+    { name: "Contacts", icon: <MdOutlineContacts size={20} />, path: "/contactspage" },
+    { name: "Tasks", icon: <Settings size={20} />, path: "/tasksdashboard" },
   ];
 
   const handleLogout = () => {

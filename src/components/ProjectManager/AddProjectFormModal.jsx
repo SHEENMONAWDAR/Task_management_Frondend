@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { X, UserPlus } from "lucide-react";
 import AddProjectMembersModal from "./AddProjectMembersModal";
-import API from "../../api"; // axios instance
+import API from "../../api"; 
+import { BASE_URL } from "../../config";
 
 export default function AddProjectFormModal({ onClose, onProjectCreated }) {
   const [formData, setFormData] = useState({
@@ -342,7 +343,7 @@ export default function AddProjectFormModal({ onClose, onProjectCreated }) {
                   >
                     <div className="flex items-center gap-2">
                       <img
-                        src={m.image}
+                        src={`${BASE_URL}/${m.image}`}
                         alt={m.name}
                         className="w-6 h-6 rounded-full"
                       />

@@ -6,6 +6,8 @@ import App from "./App";
 import HomeDashboard from "./components/Home/HomeDashboard";
 import AddProjectFormModal from "./components/ProjectManager/AddProjectFormModal";
 import ProjectDashboard from "./components/ProjectManager/ProjectDashboard";
+import ContactsPage from "./components/Contacts/ContactsPage";
+import TasksDashboard from "./components/Tasks/TasksDashboard";
 
 
 const router = createBrowserRouter([
@@ -14,7 +16,9 @@ const router = createBrowserRouter([
     { path: "/admindashboard", element: <AdminDashboard /> },
     { path: "/home", element: <HomeDashboard /> },
     { path:"/createProject",element:<AddProjectFormModal/>},
-    { path:"/projectdashboard",element:<ProjectDashboard/>}
+    { path:"/projectdashboard",element:<ProjectDashboard/>},
+    { path:"/contactspage",element:<ContactsPage/>}, 
+    { path:"/tasksdashboard",element:<TasksDashboard/>}    
 ])
 
 export default router;
