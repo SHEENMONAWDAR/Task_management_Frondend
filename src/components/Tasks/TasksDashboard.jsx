@@ -10,7 +10,6 @@ const TasksDashboard = () => {
   const [refreshKey, setRefreshKey] = useState(0); // for reloading tasks
 
   const handleTaskAdded = () => {
-    // close modal and refresh the list
     setShowModal(false);
     setRefreshKey((prev) => prev + 1);
   };

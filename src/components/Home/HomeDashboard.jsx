@@ -26,10 +26,10 @@ const HomeDashboard = () => {
 
   // derived stats
   const totalProjects = projects.length;
-  const completedProjects = projects.filter((p) => p.status === "Completed").length;
-  const inProgressProjects = projects.filter((p) => p.status === "In Progress").length;
+  const completedProjects = projects.filter((p) => p.project_status === "completed").length;
+  const inProgressProjects = projects.filter((p) => p.project_status === "In Progress").length;
   const overdueProjects = projects.filter(
-    (p) => new Date(p.due_date) < new Date() && p.status !== "Completed"
+    (p) => new Date(p.due_date) < new Date() && p.project_status !== "Completed"
   ).length;
 
   return (

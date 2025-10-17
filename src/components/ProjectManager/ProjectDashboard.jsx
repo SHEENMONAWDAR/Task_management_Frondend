@@ -112,11 +112,14 @@ const ProjectDashboard = () => {
                                             <CiCalendar />
                                             <p>
                                                 {project.project_due_date
-                                                    ? new Date(
-                                                        project.project_due_date
-                                                    ).toLocaleDateString()
+                                                    ? new Date(project.project_due_date).toLocaleDateString("en-GB", {
+                                                        day: "2-digit",
+                                                        month: "2-digit",
+                                                        year: "numeric",
+                                                    })
                                                     : "No due date"}
                                             </p>
+
                                         </div>
                                         <div className="relative">
                                             <button
@@ -222,7 +225,17 @@ const ProjectDashboard = () => {
                                         </div>
                                         <div>
                                             <p className="text-gray-500">Budget</p>
-                                            <p>{project.project_budget || "N/A"}</p>
+                                            <p>
+                                                {project.project_budget
+                                                    ? Number(project.project_budget).toLocaleString("en-US", {
+                                                        style: "currency",
+                                                        currency: "USD",
+                                                        minimumFractionDigits: 0
+                                                    })
+                                                    : "N/A"}
+                                            </p>
+
+
                                         </div>
                                         <div>
                                             <p className="text-gray-500">Start Date</p>
@@ -230,7 +243,11 @@ const ProjectDashboard = () => {
                                                 {project.project_start_date
                                                     ? new Date(
                                                         project.project_start_date
-                                                    ).toLocaleDateString()
+                                                    ).toLocaleDateString("en-GB", {
+                                                        day: "2-digit",
+                                                        month: "2-digit",
+                                                        year: "numeric",
+                                                    })
                                                     : "N/A"}
                                             </p>
                                         </div>

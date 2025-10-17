@@ -85,7 +85,7 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
 
 
             {/* Columns */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-10 rounded-md">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-10 rounded-md">
                 {/* To Do */}
                 <div className="bg-white  shadow-md border border-gray-200 hover:shadow-lg transition flex flex-col h-[90vh]">
 
