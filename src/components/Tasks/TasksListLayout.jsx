@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import API from "../../api";
 import { BASE_URL } from "../../config";
 import proimg from '../../assets/Profile.jpg'
+import { LuFileText } from "react-icons/lu";
 
 const TasksListLayout = ({ onAddTask, refreshKey }) => {
     const [todoTasks, setTodoTasks] = useState([]);
@@ -54,25 +55,38 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
             <div className="flex justify-between items-center mt-2">
                 <span className="text-gray-600">Progress</span>
                 <span className="font-medium text-gray-800">
-                    {task.project_progress}%
+                    {task.task_progress}%
                 </span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2.5">
                 <div
                     className="bg-blue-600 h-2.5 rounded-full transition-all duration-500"
-                    style={{ width: `${task.project_progress || 0}%` }}
+                    style={{ width: `${task.task_progress || 0}%` }}
                 ></div>
             </div>
             <div className="text-sm text-gray-500">
                 Due: {task.due_date ? new Date(task.due_date).toLocaleDateString() : "—"}
             </div>
-                  <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-gray-300">
-                    <img
-                      src={task.assigned_user_image ? `${BASE_URL}/${task.assigned_user_image}` : proimg}
-                      alt="Profile"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+            <div className="flex justify-between items-center mt-3">
+                <div className="flex -space-x-3">
+                    {task.users && task.users.length > 0 ? (
+                        task.users.slice(0, 3).map((user) => (
+                            <img
+                                key={user.id}
+                                src={`${BASE_URL}/${user.image}`}
+                                className="w-10 h-10 rounded-full object-cover border-2 border-white"
+                                alt={user.name}
+                            />
+                        ))
+                    ) : (
+                        <img
+                            src={proimg}
+                            className="w-10 h-10 rounded-full border-2 border-white"
+                            alt="Default"
+                        />
+                    )}
+                </div>
+            </div>
         </div>
     );
 
