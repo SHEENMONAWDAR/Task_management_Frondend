@@ -2,26 +2,43 @@ import React, { useState, useEffect } from "react";
 import Header from "../Header";
 import Sidebar from "../Sidebar";
 import API from "../../api";
-import {  CheckCircle,} from "lucide-react";
-import { LuFileText } from "react-icons/lu";
+import { CheckCircle, } from "lucide-react";
 import { PiClockCountdown } from "react-icons/pi";
 import { CiCircleAlert } from "react-icons/ci";
+import { BsThreeDots } from "react-icons/bs";
+import { CiCalendar } from "react-icons/ci";
+import proimg from "../../assets/Profile.jpg";
+import { LuFileText } from "react-icons/lu";
+import { BASE_URL } from "../../config";
+import CombinedProgressCircle from "../Charts/CombinedProgressCircle";
 
 const HomeDashboard = () => {
   const [projects, setProjects] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [taskstatus, setTaskstatus] = useState([])
+  const userId = localStorage.getItem('userid')
+
+  const fetchtaskStatus = async () => {
+    try {
+      const res = await API.get(`/tasks/taskstatus/${userId}`)
+      setTaskstatus(res.data || [])
+    } catch (error) {
+      console.error("Failed to fetch status:", err);
+    }
+  }
 
   useEffect(() => {
 
     const fetchProjects = async () => {
       try {
-        const res = await API.get("/projects");
+        const res = await API.get(`/projects/userprojects/${userId}`);
         setProjects(res.data || []);
       } catch (err) {
         console.error("Failed to fetch projects:", err);
       }
     };
     fetchProjects();
+    fetchtaskStatus();
   }, []);
 
   // derived stats
@@ -83,8 +100,185 @@ const HomeDashboard = () => {
           </div>
         </div>
 
+        {/* Project Cards */}
+        <div className="px-8 py-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {projects.length > 0 ? (
+            projects.slice(0, 3).map((project, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition p-5 space-y-3"
+              >
+                {/* Header */}
+                <div
+                  className={`border-l-4 flex justify-between ${project.project_status === "inprogress"
+                    ? "border-yellow-500"
+                    : project.project_status === "completed"
+                      ? "border-green-500"
+                      : project.project_status === "planning"
+                        ? "border-blue-500"
+                        : project.project_status === "cancelled"
+                          ? "border-orange-500"
+                          : project.project_status === "active"
+                            ? "border-orange-300"
+                            : "border-gray-300"
+                    }`}
+                >
+                  <div className="ml-2">
+                    <h1 className="font-bold text-2xl">
+                      {project.project_name}
+                    </h1>
+                    <p className="text-sm text-gray-600">
+                      {project.project_description || "No description available"}
+                    </p>
+                  </div>
+                  <div>
+                    <p
+                      className={`text-xs font-semibold px-2 py-1 rounded-full capitalize inline-block ${project.project_status === "inprogress"
+                        ? "bg-yellow-100 text-yellow-700"
+                        : project.project_status === "completed"
+                          ? "bg-green-100 text-green-700"
+                          : project.project_status === "planning"
+                            ? "bg-blue-100 text-blue-700"
+                            : project.project_status === "active"
+                              ? "bg-orange-100 text-orange-700"
+                              : "bg-gray-100 text-gray-600"
+                        }`}
+                    >
+                      {project.project_status}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Due Date */}
+                <div className="flex justify-between items-center text-gray-500">
+                  <div className="flex items-center space-x-2">
+                    <CiCalendar />
+                    <p>
+                      {project.project_due_date
+                        ? new Date(project.project_due_date).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                        })
+                        : "No due date"}
+                    </p>
+
+                  </div>
+                  <div className="relative">
+                    <button
+                      className="p-2 hover:bg-gray-100 rounded-full"
+                    >
+                      <BsThreeDots className="text-gray-600" />
+                    </button>
+                  </div>
+
+                </div>
+
+                {/* Progress */}
+                <div className="flex justify-between items-center mt-2">
+                  <span className="text-gray-600">Progress</span>
+                  <span className="font-medium text-gray-800">
+                    {project.project_progress}%
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div
+                    className="bg-blue-600 h-2.5 rounded-full transition-all duration-500"
+                    style={{ width: `${project.project_progress || 0}%` }}
+                  ></div>
+                </div>
+
+                {/* Team Section */}
+                <div className="p-4">
+                  <h2 className="text-lg font-semibold text-gray-800 mb-2">
+                    Team Members
+                  </h2>
+
+
+                  <div className="flex justify-between items-center mt-3">
+                    <div className="flex -space-x-3">
+                      {project.users && project.users.length > 0 ? (
+                        project.users.slice(0, 3).map((user) => (
+                          <img
+                            key={user.id}
+                            src={`${BASE_URL}/${user.image}` || proimg}
+                            className="w-10 h-10 rounded-full object-cover border-2 border-white"
+                            alt={user.name}
+                          />
+                        ))
+                      ) : (
+                        <img
+                          src={proimg}
+                          className="w-10 h-10 rounded-full border-2 border-white"
+                          alt="Default"
+                        />
+                      )}
+                    </div>
+
+                    <div className="flex items-center text-gray-500">
+                      <LuFileText className="mr-1" />
+                      <p className="text-sm">
+                        {project.total_tasks > 0
+                          ? `${project.total_tasks} Tasks`
+                          : "No Tasks"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <hr className="my-2" />
+
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-600 text-center col-span-3">
+              No projects available
+            </p>
+          )}
+        </div>
+        <div className="px-8 py-4 grid grid-cols-12 gap-4">
+          <div className="col-span-12 sm:col-span-12 md:col-span-8 bg-blue-200">
+            hello
+          </div>
+
+          <div className="col-span-12 sm:col-span-12 md:col-span-4 shadow rounded-2xl bg-white">
+            <div className="p-4 space-y-1">
+              <div className="text-2xl font-bold">My Progress</div>
+              <p className="text-sm">Your task completion rate</p>
+            </div>
+            <div className="flex justify-center p-2">
+              {taskstatus && taskstatus.length > 0 ? (
+                <CombinedProgressCircle
+                  completed={parseFloat(taskstatus[0].completed_percentage)}
+                  inProgress={parseFloat(taskstatus[0].inprogress_percentage)}
+                  others={parseFloat(taskstatus[0].others_percentage)}
+                />
+              ) : (
+                <p className="text-gray-600">No task data</p>
+              )}
+            </div>
+            <div className="mt-2 space-y-1 flex justify-evenly p-5 items-center">
+              {taskstatus && taskstatus.length > 0 && (
+                <><div className="items-center flex flex-col">
+                  <div className="text-2xl font-bold">{Math.round(parseFloat(taskstatus[0].completed_percentage))}%</div>
+                  <h1 className="text-green-400">Completed: </h1>
+                </div>
+                  <div className="items-center flex flex-col">
+                    <div className="text-2xl font-bold"> {Math.round(parseFloat(taskstatus[0].inprogress_percentage))}%</div>
+                    <h1 className="text-yellow-400">In Progress:</h1>
+                  </div>
+                  <div className="items-center flex flex-col">
+                    <div className="text-2xl font-bold">{Math.round(parseFloat(taskstatus[0].others_percentage))}%</div>
+                    <h1 className="text-gray-400">Others: </h1>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+
+        </div>
       </div>
-    </div>
+    </div >
   );
 };
 

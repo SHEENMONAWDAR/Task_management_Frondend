@@ -3,7 +3,7 @@ import { X, UserPlus } from "lucide-react";
 import Select from "react-select";
 import API from "../../api";
 import { BASE_URL } from "../../config";
-import AddTaskMembersModal from "./AddTaskMembersModal"; // We'll create a modal similar to AddProjectMembersModal
+import AddTaskMembersModal from "./AddTaskMembersModal";
 
 export default function AddTaskModal({ onClose, onTaskAdded }) {
   const [projects, setProjects] = useState([]);
@@ -11,6 +11,7 @@ export default function AddTaskModal({ onClose, onTaskAdded }) {
   const [loading, setLoading] = useState(false);
   const [showMembersModal, setShowMembersModal] = useState(false);
   const [assignedMembers, setAssignedMembers] = useState([]);
+  const [comments, setComments] = useState("");
 
   const [form, setForm] = useState({
     title: "",
@@ -51,6 +52,21 @@ export default function AddTaskModal({ onClose, onTaskAdded }) {
     setForm((prev) => ({ ...prev, Attachments: e.target.files[0] }));
   };
 
+  // ✅ Create comment function
+  const handleCommentCreate = async (taskId) => {
+    if (!comments.trim()) return; // Skip if no comment
+    try {
+      await API.post("/comments", {
+        task_id: taskId,
+        user_id: userId,
+        content: comments,
+      });
+      console.log("✅ Comment created successfully");
+    } catch (err) {
+      console.error("❌ Failed to create comment:", err);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.title.trim() || !form.project_id) {
@@ -70,11 +86,6 @@ export default function AddTaskModal({ onClose, onTaskAdded }) {
       });
 
       formDataToSend.append("created_by", userId);
-      formDataToSend.append(
-        "assigned_to",
-        JSON.stringify(assignedMembers.map((m) => m.id))
-      );
-
 
       const res = await API.post("/tasks", formDataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -82,10 +93,18 @@ export default function AddTaskModal({ onClose, onTaskAdded }) {
 
       const taskId = res.data.taskId;
 
-      if (assignedMembers.length > 0) {
+      // ✅ Create comment if any
+      await handleCommentCreate(taskId);
+
+      // ✅ Assign members
+      const existingMembers = await API.get(`/taskmembers/${taskId}`);
+      console.log(assignedMembers);
+
+      if (existingMembers.data.length > 0 && assignedMembers.length > 0) {
+        await API.delete(`/taskmembers/${taskId}`);
         await Promise.all(
-          assignedMembers.map((member) =>
-            API.post("/taskmembers", { task_id: taskId, user_id: member.id })
+          assignedMembers.map((m) =>
+            API.post("/taskmembers", { task_id: taskId, user_id: m.id })
           )
         );
       }
@@ -178,8 +197,8 @@ export default function AddTaskModal({ onClose, onTaskAdded }) {
                       level === "low"
                         ? "text-green-500"
                         : level === "medium"
-                        ? "text-blue-500"
-                        : "text-red-500"
+                          ? "text-blue-500"
+                          : "text-red-500"
                     }
                   >
                     {level.charAt(0).toUpperCase() + level.slice(1)}
@@ -248,12 +267,13 @@ export default function AddTaskModal({ onClose, onTaskAdded }) {
             {assignedMembers.length > 0 && (
               <ul className="mt-2 border border-gray-200 rounded-md p-2 max-h-40 overflow-y-auto space-y-2">
                 {assignedMembers.map((m) => (
-                  <li
-                    key={m.id}
-                    className="flex items-center gap-2 text-sm"
-                  >
+                  <li key={m.id} className="flex items-center gap-2 text-sm">
                     <img
-                      src={m.image ? `${BASE_URL}/${m.image}` : "/default-avatar.png"}
+                      src={
+                        m.image
+                          ? `${BASE_URL}/${m.image}`
+                          : "/default-avatar.png"
+                      }
                       alt={m.name}
                       className="w-6 h-6 rounded-full"
                     />
@@ -289,6 +309,18 @@ export default function AddTaskModal({ onClose, onTaskAdded }) {
               <option value="in-progress">In Progress</option>
               <option value="done">Done</option>
             </select>
+          </div>
+
+          {/* ✅ Comment Section */}
+          <div>
+            <label className="block text-sm font-medium">Comment (optional)</label>
+            <textarea
+              value={comments}
+              onChange={(e) => setComments(e.target.value)}
+              rows="2"
+              className="w-full border rounded-lg px-3 py-2"
+              placeholder="Add an initial comment..."
+            />
           </div>
 
           {/* Submit */}

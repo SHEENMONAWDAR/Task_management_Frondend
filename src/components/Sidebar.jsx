@@ -15,12 +15,17 @@ export default function Sidebar({ open, setOpen }) {
     { name: "Tasks", icon: <Settings size={20} />, path: "/tasksdashboard" },
   ];
 
-  const handleLogout = () => {
+const handleLogout = () => {
+  const confirmLogout = window.confirm("Are you sure you want to logout?");
+  if (confirmLogout) {
     localStorage.removeItem("token");
     localStorage.removeItem("userName");
     localStorage.removeItem("userRole");
-    navigate("/");
-  };
+    localStorage.removeItem("userid");
+    navigate("/login");
+  }
+};
+
 
   return (
     <>

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import API from "../../api";
 import { BASE_URL } from "../../config";
-import proimg from '../../assets/Profile.jpg'
+import proimg from "../../assets/Profile.jpg";
+import EditTaskModal from "../Tasks/EditTaskModal"; // ✅ import edit modal
 import { LuFileText } from "react-icons/lu";
 
 const TasksListLayout = ({ onAddTask, refreshKey }) => {
@@ -9,6 +10,10 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
     const [inProgressTasks, setInProgressTasks] = useState([]);
     const [doneTasks, setDoneTasks] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    // 🔹 For edit modal
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [selectedTaskId, setSelectedTaskId] = useState(null);
 
     const fetchTasks = async () => {
         try {
@@ -32,6 +37,11 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
         fetchTasks();
     }, [refreshKey]);
 
+    const handleEdit = (taskId) => {
+        setSelectedTaskId(taskId);
+        setShowEditModal(true);
+    };
+
     const renderTaskCard = (task) => (
         <div
             key={task.id}
@@ -52,21 +62,31 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
             </div>
 
             <p className="text-gray-600 text-sm line-clamp-3">{task.description}</p>
+            <div className="flex">
+                <div className="text-md text-blue-600"><span className="text-black text-lg mr-2">Project Name:</span>{task.project_name}</div>
+            </div>
             <div className="flex justify-between items-center mt-2">
                 <span className="text-gray-600">Progress</span>
                 <span className="font-medium text-gray-800">
                     {task.task_progress}%
                 </span>
             </div>
+
             <div className="w-full bg-gray-200 rounded-full h-2.5">
                 <div
                     className="bg-blue-600 h-2.5 rounded-full transition-all duration-500"
                     style={{ width: `${task.task_progress || 0}%` }}
                 ></div>
             </div>
+
             <div className="text-sm text-gray-500">
-                Due: {task.due_date ? new Date(task.due_date).toLocaleDateString() : "—"}
+                Due: {task.due_date ? new Date(task.due_date).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                }) : "—"}
             </div>
+
             <div className="flex justify-between items-center mt-3">
                 <div className="flex -space-x-3">
                     {task.users && task.users.length > 0 ? (
@@ -86,6 +106,14 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
                         />
                     )}
                 </div>
+
+                {/* 🔹 Edit button */}
+                <button
+                    onClick={() => handleEdit(task.id)}
+                    className="text-sm px-3 py-1 bg-yellow-500 text-white rounded-md hover:bg-yellow-600"
+                >
+                    Edit
+                </button>
             </div>
         </div>
     );
@@ -95,15 +123,10 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
 
     return (
         <div>
-            {/* Header Row */}
-
-
-            {/* Columns */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-10 rounded-md">
-                {/* To Do */}
-                <div className="bg-white  shadow-md border border-gray-200 hover:shadow-lg transition flex flex-col h-[90vh]">
-
-                    {/* Header (fixed at top) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-10">
+                {/* To Do Column */}
+                <div className="bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition flex flex-col h-[90vh] overflow-hidden">
+                    {/* Top Header */}
                     <div className="p-5 border-b flex items-center justify-between sticky top-0 bg-white z-10">
                         <div className="flex items-center gap-3">
                             <h2 className="text-xl font-semibold text-gray-800">To Do</h2>
@@ -113,7 +136,7 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
                         </div>
                     </div>
 
-                    {/* Scrollable content area */}
+                    {/* Scrollable Content */}
                     <div className="flex-1 overflow-y-auto p-5 space-y-4">
                         {todoTasks.length ? (
                             <div className="space-y-4">{todoTasks.map(renderTaskCard)}</div>
@@ -122,7 +145,7 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
                         )}
                     </div>
 
-                    {/* Footer (fixed at bottom) */}
+                    {/* Bottom Footer */}
                     <div className="p-5 border-t bg-white sticky bottom-0 z-10">
                         <button
                             onClick={onAddTask}
@@ -133,30 +156,30 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
                     </div>
                 </div>
 
-
-                {/* In Progress */}
-                <div className="bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition flex flex-col h-[90vh]">
-
-                    {/* Header (fixed at top) */}
+                {/*In Progress Column*/}
+                <div className="bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition flex flex-col h-[90vh] overflow-hidden">
+                    {/* Top Header */}
                     <div className="p-5 border-b flex items-center justify-between sticky top-0 bg-white z-10">
                         <div className="flex items-center gap-3">
-                            <h2 className="text-xl font-semibold text-gray-800">IN Progress</h2>
+                            <h2 className="text-xl font-semibold text-gray-800">In Progress</h2>
                             <span className="bg-gray-100 px-2 py-1 rounded-md text-sm font-medium">
                                 {inProgressTasks[0]?.total_tasks || 0}
                             </span>
                         </div>
                     </div>
 
-                    {/* Scrollable content area */}
+                    {/* Scrollable Content */}
                     <div className="flex-1 overflow-y-auto p-5 space-y-4">
                         {inProgressTasks.length ? (
-                            <div className="space-y-4">{inProgressTasks.map(renderTaskCard)}</div>
+                            <div className="space-y-4">
+                                {inProgressTasks.map(renderTaskCard)}
+                            </div>
                         ) : (
-                            <p className="text-gray-500 text-sm">No IN Progress tasks</p>
+                            <p className="text-gray-500 text-sm">No In Progress tasks</p>
                         )}
                     </div>
 
-                    {/* Footer (fixed at bottom) */}
+                    {/* Bottom Footer */}
                     <div className="p-5 border-t bg-white sticky bottom-0 z-10">
                         <button
                             onClick={onAddTask}
@@ -166,12 +189,9 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
                         </button>
                     </div>
                 </div>
-
-
-                {/* Done */}
-                <div className="bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition flex flex-col h-[90vh]">
-
-                    {/* Header (fixed at top) */}
+                {/* Done Column */}
+                <div className="bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition flex flex-col h-[90vh] overflow-hidden">
+                    {/* Top Header */}
                     <div className="p-5 border-b flex items-center justify-between sticky top-0 bg-white z-10">
                         <div className="flex items-center gap-3">
                             <h2 className="text-xl font-semibold text-gray-800">Done</h2>
@@ -181,7 +201,7 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
                         </div>
                     </div>
 
-                    {/* Scrollable content area */}
+                    {/* Scrollable Content */}
                     <div className="flex-1 overflow-y-auto p-5 space-y-4">
                         {doneTasks.length ? (
                             <div className="space-y-4">{doneTasks.map(renderTaskCard)}</div>
@@ -190,7 +210,7 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
                         )}
                     </div>
 
-                    {/* Footer (fixed at bottom) */}
+                    {/* Bottom Footer */}
                     <div className="p-5 border-t bg-white sticky bottom-0 z-10">
                         <button
                             onClick={onAddTask}
@@ -200,8 +220,19 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
                         </button>
                     </div>
                 </div>
-
             </div>
+
+            {/* 🔹 Edit Modal */}
+            {showEditModal && (
+                <EditTaskModal
+                    taskId={selectedTaskId}
+                    onClose={() => setShowEditModal(false)}
+                    onTaskUpdated={() => {
+                        setShowEditModal(false);
+                        fetchTasks();
+                    }}
+                />
+            )}
         </div>
     );
 };

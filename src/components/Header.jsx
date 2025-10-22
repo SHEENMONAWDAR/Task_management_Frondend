@@ -24,12 +24,16 @@ export default function Header({ setSidebarOpen, title = "Dashboard" }) {
     fetchUser();
   }, []);
 
-  const handleLogout = () => {
+const handleLogout = () => {
+  const confirmLogout = window.confirm("Are you sure you want to logout?");
+  if (confirmLogout) {
     localStorage.removeItem("token");
     localStorage.removeItem("userName");
     localStorage.removeItem("userRole");
+    localStorage.removeItem("userid");
     navigate("/login");
-  };
+  }
+};
 
     const handleAddProject = async (data) => {
     try {
