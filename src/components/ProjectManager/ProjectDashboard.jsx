@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../Header";
 import Sidebar from "../Sidebar";
 import API from "../../api";
@@ -16,6 +17,7 @@ const ProjectDashboard = () => {
     const [openMenuIndex, setOpenMenuIndex] = useState(null);
     const [editingProject, setEditingProject] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
+    const navigate = useNavigate();
 
 
 
@@ -55,7 +57,7 @@ const ProjectDashboard = () => {
 
                 {/* Main Section */}
                 <div className="flex-1 flex flex-col md:ml-64 transition-all space-y-3">
-                    <Header title="Project Dashboard" setSidebarOpen={setSidebarOpen} />
+                    <Header title="Project Dashboard" setSidebarOpen={setSidebarOpen} onProjectCreated={fetchProjects} />
 
                     {/* Project Cards */}
                     <div className="px-8 py-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-15">
@@ -81,7 +83,7 @@ const ProjectDashboard = () => {
                                             }`}
                                     >
                                         <div className="ml-2">
-                                            <h1 className="font-bold text-2xl">
+                                            <h1 className="font-bold text-2xl mb-1">
                                                 {project.project_name}
                                             </h1>
                                             <p className="text-sm text-gray-600">
@@ -111,11 +113,11 @@ const ProjectDashboard = () => {
                                         <div className="flex items-center space-x-2">
                                             <CiCalendar />
                                             <p>
-                                                {project.project_due_date
-                                                    ? new Date(project.project_due_date).toLocaleDateString("en-GB", {
+                                                Deadline: {project.project_due_date
+                                                    ? new Date(project.project_due_date).toLocaleDateString("en-US", {
+                                                        month: "short",
                                                         day: "2-digit",
-                                                        month: "2-digit",
-                                                        year: "numeric",
+                                                        year: "numeric"
                                                     })
                                                     : "No due date"}
                                             </p>
@@ -243,10 +245,10 @@ const ProjectDashboard = () => {
                                                 {project.project_start_date
                                                     ? new Date(
                                                         project.project_start_date
-                                                    ).toLocaleDateString("en-GB", {
+                                                    ).toLocaleDateString("en-US", {
+                                                        month: "short",
                                                         day: "2-digit",
-                                                        month: "2-digit",
-                                                        year: "numeric",
+                                                        year: "numeric"
                                                     })
                                                     : "N/A"}
                                             </p>

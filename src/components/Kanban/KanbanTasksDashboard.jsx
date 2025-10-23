@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import Header from "../Header";
 import Sidebar from "../Sidebar";
-import AddTaskModal from "./AddTaskModal";
-import TasksListLayout from "./TasksListLayout";
+import AddKanbanTaskModal from "./AddKanbanTaskModal";
+import KanbanTasksListLayout from "./kanbanTasksListLayout";
 
-const TasksDashboard = () => {
+const KanbanTasksDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0); // for reloading tasks
@@ -32,13 +32,13 @@ const TasksDashboard = () => {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col md:ml-64 transition-all">
-        <Header title="My Tasks" setSidebarOpen={setSidebarOpen} />
+        <Header title="Kanban" setSidebarOpen={setSidebarOpen} />
 
         <div className="p-8">
-          <TasksListLayout onAddTask={() => setShowModal(true)} refreshKey={refreshKey} />
+          <KanbanTasksListLayout onAddTask={() => setShowModal(true)} refreshKey={refreshKey} />
 
           {showModal && (
-            <AddTaskModal
+            <AddKanbanTaskModal
               onClose={() => setShowModal(false)}
               onTaskAdded={handleTaskAdded}
             />
@@ -49,4 +49,4 @@ const TasksDashboard = () => {
   );
 };
 
-export default TasksDashboard;
+export default KanbanTasksDashboard;

@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import API from "../../api";
 import { BASE_URL } from "../../config";
 import proimg from "../../assets/Profile.jpg";
-import EditTaskModal from "../Tasks/EditTaskModal"; // ✅ import edit modal
+import EditKanbanTaskModal from "../Kanban/EditKanbanTaskModal";
 import { LuFileText } from "react-icons/lu";
 import { FiMessageSquare } from "react-icons/fi";
 
-const TasksListLayout = ({ onAddTask, refreshKey }) => {
+const KanbanTasksListLayout = ({ onAddTask, refreshKey }) => {
     const [todoTasks, setTodoTasks] = useState([]);
     const [inProgressTasks, setInProgressTasks] = useState([]);
     const [doneTasks, setDoneTasks] = useState([]);
@@ -16,15 +16,13 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [selectedTaskId, setSelectedTaskId] = useState(null);
 
-    const userId = localStorage.getItem("userid")
-
     const fetchTasks = async () => {
         try {
             setLoading(true);
             const [todoRes, progressRes, doneRes] = await Promise.all([
-                API.get(`/tasks/mytodo/${userId}`),
-                API.get(`/tasks/myinprogress/${userId}`),
-                API.get(`/tasks/mydone/${userId}`),
+                API.get("/tasks/todo"),
+                API.get("/tasks/inprogress"),
+                API.get("/tasks/done"),
             ]);
             setTodoTasks(todoRes.data);
             setInProgressTasks(progressRes.data);
@@ -81,6 +79,7 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
                     style={{ width: `${task.task_progress || 0}%` }}
                 ></div>
             </div>
+
             <div className="flex justify-between">
                 <div className="text-sm text-gray-500">
                     Due: {task.due_date ? new Date(task.due_date).toLocaleDateString("en-US", {
@@ -90,10 +89,9 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
                     }) : "—"}
                 </div>
                 <div className="flex items-center gap-1">
-                    <div><FiMessageSquare /></div><div className="">{task.comment_count}</div>
+                    <div><FiMessageSquare /></div><div>{task.comment_count}</div>
                 </div>
             </div>
-
 
             <div className="flex justify-between items-center mt-3">
                 <div className="flex -space-x-3">
@@ -113,6 +111,7 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
                             alt="Default"
                         />
                     )}
+
                 </div>
 
                 {/* 🔹 Edit button */}
@@ -232,7 +231,7 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
 
             {/* 🔹 Edit Modal */}
             {showEditModal && (
-                <EditTaskModal
+                <EditKanbanTaskModal
                     taskId={selectedTaskId}
                     onClose={() => setShowEditModal(false)}
                     onTaskUpdated={() => {
@@ -245,4 +244,4 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
     );
 };
 
-export default TasksListLayout;
+export default KanbanTasksListLayout;

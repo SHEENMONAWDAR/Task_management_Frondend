@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../Header";
 import Sidebar from "../Sidebar";
 import API from "../../api";
@@ -11,12 +12,14 @@ import proimg from "../../assets/Profile.jpg";
 import { LuFileText } from "react-icons/lu";
 import { BASE_URL } from "../../config";
 import CombinedProgressCircle from "../Charts/CombinedProgressCircle";
+import WaveProgressChart from "../Charts/WaveProgressChart";
 
 const HomeDashboard = () => {
   const [projects, setProjects] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [taskstatus, setTaskstatus] = useState([])
   const userId = localStorage.getItem('userid')
+  const navigate = useNavigate();
 
   const fetchtaskStatus = async () => {
     try {
@@ -69,7 +72,7 @@ const HomeDashboard = () => {
         <Header title="Home Dashboard" setSidebarOpen={setSidebarOpen} />
 
         {/* Status Card Section */}
-        <div className="px-8 py-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mt-15 ">
+        <div className="px-8 py-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mt-15">
           {/* Total Projects */}
           <div className="bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition p-5 space-y-3">
             <LuFileText size={38} className="text-blue-500 p-1 bg-blue-100 rounded-lg" />
@@ -97,6 +100,16 @@ const HomeDashboard = () => {
             <CiCircleAlert size={38} className="text-blue-500 p-1 bg-blue-100 rounded-lg" />
             <h3 className="text-lg font-semibold text-gray-800 mb-2">Overdue</h3>
             <p className="text-gray-600 text-sm">{overdueProjects}</p>
+          </div>
+        </div>
+
+
+
+        <div className="px-8 py-1 flex items-center justify-between">
+          <div className="font-bold text-3xl">My Projects</div>
+          <div className="flex gap-2">
+            <div className="bg-white text-md font-bold rounded-md px-3 py-3"><button onClick={() => navigate("/projectdashboard")}>All Projects</button></div>
+            <div className="bg-gray-400 rounded-md text-white px-3 py-3">Grid</div>
           </div>
         </div>
 
@@ -154,11 +167,11 @@ const HomeDashboard = () => {
                   <div className="flex items-center space-x-2">
                     <CiCalendar />
                     <p>
-                      {project.project_due_date
-                        ? new Date(project.project_due_date).toLocaleDateString("en-GB", {
+                      Deadline: {project.project_due_date
+                        ? new Date(project.project_due_date).toLocaleDateString("en-US", {
+                          month: "short",
                           day: "2-digit",
-                          month: "2-digit",
-                          year: "numeric",
+                          year: "numeric"
                         })
                         : "No due date"}
                     </p>
@@ -236,47 +249,63 @@ const HomeDashboard = () => {
             </p>
           )}
         </div>
-        <div className="px-8 py-4 grid grid-cols-12 gap-4">
-          <div className="col-span-12 sm:col-span-12 md:col-span-8 bg-blue-200">
-            hello
-          </div>
+<div className="px-6 py-6 grid grid-cols-12 gap-6">
+  {/* Chart Section */}
+  <div className="col-span-12 md:col-span-8 p-6 bg-white rounded-3xl shadow-lg">
+    <WaveProgressChart />
+  </div>
 
-          <div className="col-span-12 sm:col-span-12 md:col-span-4 shadow rounded-2xl bg-white">
-            <div className="p-4 space-y-1">
-              <div className="text-2xl font-bold">My Progress</div>
-              <p className="text-sm">Your task completion rate</p>
-            </div>
-            <div className="flex justify-center p-2">
-              {taskstatus && taskstatus.length > 0 ? (
-                <CombinedProgressCircle
-                  completed={parseFloat(taskstatus[0].completed_percentage)}
-                  inProgress={parseFloat(taskstatus[0].inprogress_percentage)}
-                  others={parseFloat(taskstatus[0].others_percentage)}
-                />
-              ) : (
-                <p className="text-gray-600">No task data</p>
-              )}
-            </div>
-            <div className="mt-2 space-y-1 flex justify-evenly p-5 items-center">
-              {taskstatus && taskstatus.length > 0 && (
-                <><div className="items-center flex flex-col">
-                  <div className="text-2xl font-bold">{Math.round(parseFloat(taskstatus[0].completed_percentage))}%</div>
-                  <h1 className="text-green-400">Completed: </h1>
-                </div>
-                  <div className="items-center flex flex-col">
-                    <div className="text-2xl font-bold"> {Math.round(parseFloat(taskstatus[0].inprogress_percentage))}%</div>
-                    <h1 className="text-yellow-400">In Progress:</h1>
-                  </div>
-                  <div className="items-center flex flex-col">
-                    <div className="text-2xl font-bold">{Math.round(parseFloat(taskstatus[0].others_percentage))}%</div>
-                    <h1 className="text-gray-400">Others: </h1>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
+  {/* Progress Circle Section */}
+  <div className="col-span-12 md:col-span-4 bg-white shadow-lg rounded-3xl p-6 flex flex-col justify-between">
+    {/* Header */}
+    <div className="mb- text-center md:text-left">
+      <h2 className="text-2xl font-bold text-gray-800">My Progress</h2>
+      <p className="text-gray-500 text-sm">Your task completion rate</p>
+    </div>
 
+    {/* Circle */}
+    <div className="flex justify-center my-4">
+      {taskstatus && taskstatus.length > 0 ? (
+        <CombinedProgressCircle
+          completed={parseFloat(taskstatus[0].completed_percentage)}
+          inProgress={parseFloat(taskstatus[0].inprogress_percentage)}
+          others={parseFloat(taskstatus[0].others_percentage)}
+        />
+      ) : (
+        <p className="text-gray-500">No task data</p>
+      )}
+    </div>
+
+    {/* Percentages */}
+    {taskstatus && taskstatus.length > 0 && (
+      <div className="grid grid-cols-3 text-center gap-4">
+        {/* Completed */}
+        <div className="flex flex-col items-center">
+          <span className="text-2xl font-bold text-green-600">
+            {Math.round(parseFloat(taskstatus[0].completed_percentage))}%
+          </span>
+          <span className="text-green-400 font-medium">Completed</span>
         </div>
+
+        {/* In Progress */}
+        <div className="flex flex-col items-center">
+          <span className="text-2xl font-bold text-yellow-500">
+            {Math.round(parseFloat(taskstatus[0].inprogress_percentage))}%
+          </span>
+          <span className="text-yellow-400 font-medium">In Progress</span>
+        </div>
+
+        {/* Others */}
+        <div className="flex flex-col items-center">
+          <span className="text-2xl font-bold text-gray-500">
+            {Math.round(parseFloat(taskstatus[0].others_percentage))}%
+          </span>
+          <span className="text-gray-400 font-medium">Others</span>
+        </div>
+      </div>
+    )}
+  </div>
+</div>
       </div>
     </div >
   );

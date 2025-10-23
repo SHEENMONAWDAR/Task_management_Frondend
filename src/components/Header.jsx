@@ -5,7 +5,7 @@ import API from "../api";
 import AddProjectFormModal from "./ProjectManager/AddProjectFormModal";
 import { BASE_URL } from "../config";
 
-export default function Header({ setSidebarOpen, title = "Dashboard" }) {
+export default function Header({ setSidebarOpen, title,onProjectCreated  }) {
   const [user, setUser] = useState({ name: "Admin", image: "" });
   const [menuOpen, setMenuOpen] = useState(false);
   const [openAddProjectModal, setOpenAddProjectModal] = useState(false);
@@ -24,18 +24,18 @@ export default function Header({ setSidebarOpen, title = "Dashboard" }) {
     fetchUser();
   }, []);
 
-const handleLogout = () => {
-  const confirmLogout = window.confirm("Are you sure you want to logout?");
-  if (confirmLogout) {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("userRole");
-    localStorage.removeItem("userid");
-    navigate("/login");
-  }
-};
+  const handleLogout = () => {
+    const confirmLogout = window.confirm("Are you sure you want to logout?");
+    if (confirmLogout) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userName");
+      localStorage.removeItem("userRole");
+      localStorage.removeItem("userid");
+      navigate("/login");
+    }
+  };
 
-    const handleAddProject = async (data) => {
+  const handleAddProject = async (data) => {
     try {
       const res = await API.post("/projects", data);
       alert("Project created successfully!");
@@ -77,7 +77,7 @@ const handleLogout = () => {
           <Bell />
           <div
             className="bg-blue-600 cursor-pointer px-5 py-2 rounded-md text-white inline-block"
-            onClick={() => setOpenAddProjectModal(true)} 
+            onClick={() => setOpenAddProjectModal(true)}
             onSubmit={handleAddProject}
           >
             <button className="flex items-center gap-2">
@@ -151,9 +151,13 @@ const handleLogout = () => {
       </header>
 
       {openAddProjectModal && (
-        <AddProjectFormModal 
-
-        onClose={() => setOpenAddProjectModal(false)} />
+        <AddProjectFormModal
+          onClose={() => setOpenAddProjectModal(false)}
+          onProjectCreated={() => {
+            if (onProjectCreated) onProjectCreated(); 
+            setOpenAddProjectModal(false); 
+          }}
+        />
       )}
     </>
   );

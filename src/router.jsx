@@ -8,6 +8,7 @@ import AddProjectFormModal from "./components/ProjectManager/AddProjectFormModal
 import ProjectDashboard from "./components/ProjectManager/ProjectDashboard";
 import ContactsPage from "./components/Contacts/ContactsPage";
 import TasksDashboard from "./components/Tasks/TasksDashboard";
+import KanbanTasksDashboard from "./components/Kanban/KanbanTasksDashboard";
 
 
 const router = createBrowserRouter([
@@ -18,7 +19,8 @@ const router = createBrowserRouter([
     { path:"/createProject",element:<AddProjectFormModal/>},
     { path:"/projectdashboard",element:<ProjectDashboard/>},
     { path:"/contactspage",element:<ContactsPage/>}, 
-    { path:"/tasksdashboard",element:<TasksDashboard/>}    
+    { path:"/tasksdashboard",element:<TasksDashboard/>},
+    {path:"/kanbandashboard",element:<KanbanTasksDashboard/>}    
 ])
 
 export default router;

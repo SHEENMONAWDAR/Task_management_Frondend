@@ -94,7 +94,6 @@ export default function AddProjectFormModal({ onClose, onProjectCreated }) {
       });
       const project_id = projectRes.data.project_id;
 
-      // 2️⃣ Add members with their specific roles
       if (members.length > 0) {
         for (const member of members) {
           await API.post("/projectmembers", {

@@ -20,12 +20,13 @@ export default function EditProjectFormModal({ project, onClose, onProjectUpdate
   });
 
   const [members, setMembers] = useState([]);
+  const [originalMembers, setOriginalMembers] = useState([]);
   const [projectLogo, setProjectLogo] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [showMembersModal, setShowMembersModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Prefill data
+  // Prefill project data
   useEffect(() => {
     if (project) {
       setFormData({
@@ -44,20 +45,21 @@ export default function EditProjectFormModal({ project, onClose, onProjectUpdate
         owner_name: project.project_owner_name || "",
         status: project.project_status || "active",
       });
-      setPreviewUrl(
-        project.project_logo ? `${BASE_URL}/uploads/${project.project_logo}` : null
-      );
-      setMembers(project.users || []);
+
+      setPreviewUrl(project.project_logo ? `${BASE_URL}/${project.project_logo}` : null);
+      const validUsers = (project.users || []).filter(u => u && u.id);
+      setMembers(validUsers);
+      setOriginalMembers(validUsers);
     }
   }, [project]);
 
-  // Input change
+  // Input change handler
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // File change
+  // File change handler
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -73,35 +75,59 @@ export default function EditProjectFormModal({ project, onClose, onProjectUpdate
     );
   };
 
+  // Check if members changed
+  const hasMembersChanged = () => {
+    if (members.length !== originalMembers.length) return true;
+
+    for (let m of members) {
+      const original = originalMembers.find((o) => o.id === m.id);
+      if (!original) return true; // new member added
+      if ((original.role || "Viewer") !== (m.role || "Viewer")) return true; // role changed
+    }
+
+    return false;
+  };
+
   // Submit updated project
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      // Prepare FormData
       const formDataToSend = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
         formDataToSend.append(key, value);
       });
       if (projectLogo) formDataToSend.append("project_logo", projectLogo);
 
-      // ✅ Update project
+      // Update project details
       await API.put(`/projects/${project.project_id}`, formDataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      // ✅ Optionally update members
-      for (const member of members) {
-        await API.put(`/projectmembers/${project.project_id}`, {
-          role: member.role || "Viewer",
-        });
+      // Update project members only if changed
+      if (hasMembersChanged()) {
+        // Optionally delete old members
+        await API.delete(`/projectmembers/${project.project_id}`);
+
+        // Add new/updated members
+        for (const member of members) {
+          console.log("Members to send:", members);
+          await API.post("/projectmembers", {
+            project_id: project.project_id,
+            user_id: member.id,
+            role: member.role || "Viewer",
+          });
+        }
       }
 
+
       alert("✅ Project updated successfully!");
-      if (onProjectUpdated) onProjectUpdated();
+      onProjectUpdated?.();
       onClose();
     } catch (err) {
-      console.error("❌ Failed to update project:", err);
+      console.error("❌ Failed to update project:", err.response?.data || err.message);
       alert("Error updating project. Check console for details.");
     } finally {
       setLoading(false);
@@ -111,7 +137,10 @@ export default function EditProjectFormModal({ project, onClose, onProjectUpdate
   return (
     <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50 overflow-y-auto">
       <div className="bg-white rounded-2xl shadow-lg w-full max-w-lg p-6 relative animate-fadeIn my-10 max-h-[90vh] overflow-y-auto">
-        <button onClick={onClose} className="absolute top-3 right-3 text-gray-500 hover:text-black">
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 text-gray-500 hover:text-black"
+        >
           <X />
         </button>
 
@@ -121,7 +150,9 @@ export default function EditProjectFormModal({ project, onClose, onProjectUpdate
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Project Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Project Name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Project Name
+            </label>
             <input
               name="name"
               value={formData.name}
@@ -133,7 +164,9 @@ export default function EditProjectFormModal({ project, onClose, onProjectUpdate
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
             <textarea
               name="description"
               value={formData.description}
@@ -150,7 +183,7 @@ export default function EditProjectFormModal({ project, onClose, onProjectUpdate
             {previewUrl ? (
               <img
                 src={previewUrl}
-                alt="Preview"
+                alt="Project Logo"
                 className="w-24 h-24 object-cover mx-auto rounded-md"
               />
             ) : (
@@ -167,7 +200,9 @@ export default function EditProjectFormModal({ project, onClose, onProjectUpdate
 
           {/* Members */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Project Members</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Project Members
+            </label>
             <button
               type="button"
               onClick={() => setShowMembersModal(true)}
@@ -179,10 +214,13 @@ export default function EditProjectFormModal({ project, onClose, onProjectUpdate
             {members.length > 0 && (
               <ul className="mt-2 border border-gray-200 rounded-md p-2 space-y-2">
                 {members.map((m) => (
-                  <li key={m.id} className="flex justify-between items-center text-sm">
+                  <li
+                    key={m.id}
+                    className="flex justify-between items-center text-sm"
+                  >
                     <div className="flex items-center gap-2">
                       <img
-                        src={`${BASE_URL}/uploads/${m.image}`}
+                        src={m.image ? `${BASE_URL}/${m.image}` : "/placeholder.jpg"}
                         alt={m.name}
                         className="w-6 h-6 rounded-full"
                       />
@@ -204,6 +242,7 @@ export default function EditProjectFormModal({ project, onClose, onProjectUpdate
             )}
           </div>
 
+          {/* Buttons */}
           <div className="flex justify-end gap-2 pt-2">
             <button
               type="button"

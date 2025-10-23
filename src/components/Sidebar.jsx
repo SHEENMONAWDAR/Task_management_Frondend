@@ -1,18 +1,21 @@
 import React from "react";
 import { Home, Users, BarChart, Settings, LogOut, X} from "lucide-react";
-import { LuFileText } from "react-icons/lu";
+import { FaRegFolderClosed } from "react-icons/fa6";
 import { NavLink, useNavigate } from "react-router-dom";
 import { MdOutlineContacts } from "react-icons/md";
+import { LuLayoutGrid } from "react-icons/lu";
+import { MdOutlineAdminPanelSettings } from "react-icons/md";
 
 export default function Sidebar({ open, setOpen }) {
   const navigate = useNavigate();
 
   const menuItems = [
     { name: "Home", icon: <Home size={20} />, path: "/home" },
-    { name: "AdminDashboard", icon: <Home size={20} />, path: "/admindashboard" },
-    { name: "Projects", icon: <LuFileText size={20} />, path: "/projectdashboard" },
+    { name: "AdminDashboard", icon: <MdOutlineAdminPanelSettings size={20} />, path: "/admindashboard" },
+    { name: "Projects", icon: <FaRegFolderClosed size={20} />, path: "/projectdashboard" },
     { name: "Contacts", icon: <MdOutlineContacts size={20} />, path: "/contactspage" },
-    { name: "Tasks", icon: <Settings size={20} />, path: "/tasksdashboard" },
+    { name: "My Tasks", icon: <Settings size={20} />, path: "/tasksdashboard" },
+    { name: "Kanban Desk", icon: <LuLayoutGrid size={20} />, path: "/kanbandashboard" },
   ];
 
 const handleLogout = () => {
@@ -41,7 +44,7 @@ const handleLogout = () => {
             <div className="flex items-center justify-center w-8 h-8 bg-blue-500 text-white rounded-full font-bold">
               M
             </div>
-            <h2 className="text-lg font-bold tracking-wide">MyApp</h2>
+            <h2 className="text-lg font-bold tracking-wider">MyApp</h2>
           </div>
 
           {/* Close button for mobile */}
