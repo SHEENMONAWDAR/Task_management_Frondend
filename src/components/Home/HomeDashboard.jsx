@@ -77,7 +77,7 @@ const HomeDashboard = () => {
           <div className="bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition p-5 space-y-3">
             <LuFileText size={38} className="text-blue-500 p-1 bg-blue-100 rounded-lg" />
             <h3 className="text-lg font-semibold text-gray-800 mb-2">Total Projects</h3>
-            <p className="text-gray-600 text-sm">{totalProjects}</p>
+            <p className="text-gray-600 text-4xl font-bold">{totalProjects}</p>
           </div>
 
           {/* Project Completed */}
@@ -85,21 +85,21 @@ const HomeDashboard = () => {
             <CheckCircle size={38} className="text-blue-500 p-1 bg-blue-100 rounded-lg" />
 
             <h3 className="text-lg font-semibold text-gray-800 mb-2">Project Completed</h3>
-            <p className="text-gray-600 text-sm">{completedProjects}</p>
+            <p className="text-gray-600 text-4xl font-bold">{completedProjects}</p>
           </div>
 
           {/* In Progress */}
           <div className="bg-white rounded-2xl shadow-md border items-start border-gray-200 hover:shadow-lg transition  p-5 space-y-3">
             <PiClockCountdown size={38} className="text-blue-500 p-1 bg-blue-100 rounded-lg" />
             <h3 className="text-lg font-semibold text-gray-800 mb-2">In Progress</h3>
-            <p className="text-gray-600 text-sm">{inProgressProjects}</p>
+            <p className="text-gray-600 text-4xl font-bold">{inProgressProjects}</p>
           </div>
 
           {/* Overdue */}
           <div className="bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition  p-5 space-y-3">
             <CiCircleAlert size={38} className="text-blue-500 p-1 bg-blue-100 rounded-lg" />
             <h3 className="text-lg font-semibold text-gray-800 mb-2">Overdue</h3>
-            <p className="text-gray-600 text-sm">{overdueProjects}</p>
+            <p className="text-gray-600 text-4xl font-bold">{overdueProjects}</p>
           </div>
         </div>
 

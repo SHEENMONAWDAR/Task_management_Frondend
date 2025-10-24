@@ -23,11 +23,13 @@ export default function Page({ onClose }) {
                     res = await API.get("/tasks", {
                         params: searchQuery ? { q: searchQuery } : {},
                     });
+                    
                     setTasks(res.data || []);
                 } else if (activeTab === "projects") {
                     res = await API.get("/projects/all", {
                         params: searchQuery ? { q: searchQuery } : {},
                     });
+                    console.log(res)
                     setProjects(res.data || []);
                 } else if (activeTab === "people") {
                     res = await API.get("/users", {

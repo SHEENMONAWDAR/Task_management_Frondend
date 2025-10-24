@@ -48,7 +48,7 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
     const renderTaskCard = (task) => (
         <div
             key={task.id}
-            className="bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition p-5 space-y-3"
+            className="bg-white rounded-md shadow-md border border-gray-200 hover:shadow-lg transition p-5 space-y-3"
         >
             <div className="flex justify-between items-start">
                 <h2 className="font-semibold text-lg text-gray-800">{task.title}</h2>
@@ -66,7 +66,7 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
 
             <p className="text-gray-600 text-sm line-clamp-3">{task.description}</p>
             <div className="flex">
-                <div><span className="text-black text-md mr-2">Project Name:</span><span className="text-md font-bold text-blue-600">{task.project_name}</span></div>
+                <div><span className="text-black text-md mr-2">Project Name:</span><span className="text-md font-semibold bg-gray-100 rounded-md px-2">{task.project_name}</span></div>
             </div>
             <div className="flex justify-between items-center mt-2">
                 <span className="text-gray-600">Project progress</span>
@@ -133,12 +133,12 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
         <div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-10">
                 {/* To Do Column */}
-                <div className="bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition flex flex-col h-[90vh] overflow-hidden">
+                <div className="bg-blue-50 rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition flex flex-col h-[90vh] overflow-hidden">
                     {/* Top Header */}
-                    <div className="p-5 border-b flex items-center justify-between sticky top-0 bg-white z-10">
+                    <div className="p-5 border-b flex items-center justify-between sticky top-0 z-10">
                         <div className="flex items-center gap-3">
                             <h2 className="text-xl font-semibold text-gray-800">To Do</h2>
-                            <span className="bg-gray-100 px-2 py-1 rounded-md text-sm font-medium">
+                            <span className="bg-white px-2 py-1 rounded-md text-sm font-medium">
                                 {todoTasks[0]?.total_tasks || 0}
                             </span>
                         </div>
@@ -154,10 +154,10 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
                     </div>
 
                     {/* Bottom Footer */}
-                    <div className="p-5 border-t bg-white sticky bottom-0 z-10">
+                    <div className="p-5 border-t sticky bottom-0 z-10">
                         <button
                             onClick={onAddTask}
-                            className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+                            className="w-full bg-slate-400 text-white px-4 py-2 rounded-lg hover:bg-white hover:text-black transition"
                         >
                             + Add Task
                         </button>
@@ -165,12 +165,12 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
                 </div>
 
                 {/*In Progress Column*/}
-                <div className="bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition flex flex-col h-[90vh] overflow-hidden">
+                <div className="bg-yellow-50 rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition flex flex-col h-[90vh] overflow-hidden">
                     {/* Top Header */}
-                    <div className="p-5 border-b flex items-center justify-between sticky top-0 bg-white z-10">
+                    <div className="p-5 border-b flex items-center justify-between sticky top-0 z-10">
                         <div className="flex items-center gap-3">
                             <h2 className="text-xl font-semibold text-gray-800">In Progress</h2>
-                            <span className="bg-gray-100 px-2 py-1 rounded-md text-sm font-medium">
+                            <span className="bg-white px-2 py-1 rounded-md text-sm font-medium">
                                 {inProgressTasks[0]?.total_tasks || 0}
                             </span>
                         </div>
@@ -188,22 +188,22 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
                     </div>
 
                     {/* Bottom Footer */}
-                    <div className="p-5 border-t bg-white sticky bottom-0 z-10">
+                    <div className="p-5 border-t sticky bottom-0 z-10">
                         <button
                             onClick={onAddTask}
-                            className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+                            className="w-full bg-slate-400 text-white px-4 py-2 rounded-lg hover:bg-white hover:text-black transition"
                         >
                             + Add Task
                         </button>
                     </div>
                 </div>
                 {/* Done Column */}
-                <div className="bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition flex flex-col h-[90vh] overflow-hidden">
+                <div className="bg-green-50 rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition flex flex-col h-[90vh] overflow-hidden">
                     {/* Top Header */}
-                    <div className="p-5 border-b flex items-center justify-between sticky top-0 bg-white z-10">
+                    <div className="p-5 border-b flex items-center justify-between sticky top-0 z-10">
                         <div className="flex items-center gap-3">
                             <h2 className="text-xl font-semibold text-gray-800">Done</h2>
-                            <span className="bg-gray-100 px-2 py-1 rounded-md text-sm font-medium">
+                            <span className="bg-white px-2 py-1 rounded-md text-sm font-medium">
                                 {doneTasks[0]?.total_tasks || 0}
                             </span>
                         </div>
@@ -219,10 +219,10 @@ const TasksListLayout = ({ onAddTask, refreshKey }) => {
                     </div>
 
                     {/* Bottom Footer */}
-                    <div className="p-5 border-t bg-white sticky bottom-0 z-10">
+                    <div className="p-5 border-t sticky bottom-0 z-10">
                         <button
                             onClick={onAddTask}
-                            className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+                            className="w-full bg-slate-400 text-white px-4 py-2 rounded-lg hover:bg-white hover:text-black transition"
                         >
                             + Add Task
                         </button>

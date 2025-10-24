@@ -22,6 +22,7 @@ export default function Register() {
 
             setMessage(res.data.message);
             formRef.current.reset();
+            navigate('/login')
         } catch (err) {
             setMessage(err.response?.data?.error || "Registration failed");
         } finally {

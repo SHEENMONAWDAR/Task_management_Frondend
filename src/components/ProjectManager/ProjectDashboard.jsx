@@ -10,6 +10,7 @@ import { LuFileText } from "react-icons/lu";
 import { BASE_URL } from "../../config";
 import EditProjectFormModal from "./EditProjectFormModal";
 import userimg from '../../assets/Profile.jpg'
+import ProjectDetails from "./ProjectDetails/ProjectDetails";
 
 
 const ProjectDashboard = () => {
@@ -18,6 +19,8 @@ const ProjectDashboard = () => {
     const [openMenuIndex, setOpenMenuIndex] = useState(null);
     const [editingProject, setEditingProject] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
+    const [openDetailsModal, setOpenDetailsModal] = useState(false);
+    const [details, setDetails] = useState(false);
     const navigate = useNavigate();
 
 
@@ -66,7 +69,7 @@ const ProjectDashboard = () => {
                             projects.map((project, index) => (
                                 <div
                                     key={index}
-                                    className="bg-white rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition p-5 space-y-3"
+                                    className="bg-white rounded-md shadow-md border border-gray-200 hover:shadow-lg transition p-5 space-y-3"
                                 >
                                     {/* Header */}
                                     <div
@@ -140,7 +143,10 @@ const ProjectDashboard = () => {
                                                     <ul className="text-sm text-gray-700">
                                                         <li
                                                             className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                                                            onClick={() => alert(`Viewing project ${project.project_name}`)}
+                                                            onClick={() => {
+                                                                setDetails(project);
+                                                                setOpenDetailsModal(true);
+                                                            }}
                                                         >
                                                             View Details
                                                         </li>
@@ -193,7 +199,7 @@ const ProjectDashboard = () => {
                                                     project.users.slice(0, 3).map((user) => (
                                                         <img
                                                             key={user.id}
-                                                            src={user.image ? `${BASE_URL}/${user.image}`: proimg}
+                                                            src={user.image ? `${BASE_URL}/${user.image}` : proimg}
                                                             className="w-10 h-10 rounded-full object-cover border-2 border-white"
                                                             alt={user.name}
                                                         />
@@ -284,6 +290,13 @@ const ProjectDashboard = () => {
                 <EditProjectFormModal
                     project={editingProject}
                     onClose={() => setShowEditModal(false)}
+                    onProjectUpdated={fetchProjects}
+                />
+            )}
+            {openDetailsModal && (
+                <ProjectDetails
+                    project={details}
+                    onClose={() => setOpenDetailsModal(false)}
                     onProjectUpdated={fetchProjects}
                 />
             )}

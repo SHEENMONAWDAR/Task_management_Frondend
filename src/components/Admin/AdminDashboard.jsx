@@ -26,6 +26,7 @@ export default function AdminDashboard() {
       );
       await API.put(`/users/${id}`, updates);
     } catch (err) {
+      window.alert("Access denied. Admins only.")
       console.error("Failed to update user:", err);
     }
   };
