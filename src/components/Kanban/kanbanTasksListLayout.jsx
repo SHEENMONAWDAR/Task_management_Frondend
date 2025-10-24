@@ -67,7 +67,7 @@ const KanbanTasksListLayout = ({ onAddTask, refreshKey }) => {
                 <div><span className="text-black text-md mr-2">Project Name:</span><span className="text-md font-bold text-blue-600">{task.project_name}</span></div>
             </div>
             <div className="flex justify-between items-center mt-2">
-                <span className="text-gray-600">Progress</span>
+                <span className="text-gray-600">Project progress</span>
                 <span className="font-medium text-gray-800">
                     {task.task_progress}%
                 </span>

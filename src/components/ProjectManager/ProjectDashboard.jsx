@@ -9,6 +9,7 @@ import proimg from "../../assets/Profile.jpg";
 import { LuFileText } from "react-icons/lu";
 import { BASE_URL } from "../../config";
 import EditProjectFormModal from "./EditProjectFormModal";
+import userimg from '../../assets/Profile.jpg'
 
 
 const ProjectDashboard = () => {
@@ -192,7 +193,7 @@ const ProjectDashboard = () => {
                                                     project.users.slice(0, 3).map((user) => (
                                                         <img
                                                             key={user.id}
-                                                            src={`${BASE_URL}/${user.image}` || proimg}
+                                                            src={user.image ? `${BASE_URL}/${user.image}`: proimg}
                                                             className="w-10 h-10 rounded-full object-cover border-2 border-white"
                                                             alt={user.name}
                                                         />

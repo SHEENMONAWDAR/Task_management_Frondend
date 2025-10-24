@@ -1,13 +1,17 @@
 import React from "react";
-import { Home, Users, BarChart, Settings, LogOut, X} from "lucide-react";
+import { useState } from "react";
+import { Home, Users, BarChart, Settings, LogOut, X } from "lucide-react";
 import { FaRegFolderClosed } from "react-icons/fa6";
 import { NavLink, useNavigate } from "react-router-dom";
 import { MdOutlineContacts } from "react-icons/md";
 import { LuLayoutGrid } from "react-icons/lu";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
+import { IoSearchSharp } from "react-icons/io5";
+import Page from "./Search/page";
 
 export default function Sidebar({ open, setOpen }) {
   const navigate = useNavigate();
+  const [openSearchModal, setOpenSearchModal] = useState(false);
 
   const menuItems = [
     { name: "Home", icon: <Home size={20} />, path: "/home" },
@@ -16,18 +20,19 @@ export default function Sidebar({ open, setOpen }) {
     { name: "Contacts", icon: <MdOutlineContacts size={20} />, path: "/contactspage" },
     { name: "My Tasks", icon: <Settings size={20} />, path: "/tasksdashboard" },
     { name: "Kanban Desk", icon: <LuLayoutGrid size={20} />, path: "/kanbandashboard" },
+    { name: "Search", icon: <IoSearchSharp size={20} />, path: "" },
   ];
 
-const handleLogout = () => {
-  const confirmLogout = window.confirm("Are you sure you want to logout?");
-  if (confirmLogout) {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("userRole");
-    localStorage.removeItem("userid");
-    navigate("/login");
-  }
-};
+  const handleLogout = () => {
+    const confirmLogout = window.confirm("Are you sure you want to logout?");
+    if (confirmLogout) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userName");
+      localStorage.removeItem("userRole");
+      localStorage.removeItem("userid");
+      navigate("/login");
+    }
+  };
 
 
   return (
@@ -60,19 +65,32 @@ const handleLogout = () => {
         <ul className="mt-4 space-y-1">
           {menuItems.map((item, index) => (
             <li key={index}>
-              <NavLink
-                to={item.path}
-                onClick={() => setOpen(false)}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors
-                  ${isActive
-                    ? "bg-gray-700 text-white"
-                    : " hover:bg-blue-100 hover:text-blue-800"}`
-                }
-              >
-                {item.icon}
-                <span>{item.name}</span>
-              </NavLink>
+              {item.name === "Search" ? (
+                <button
+                  onClick={() => {
+                    setOpenSearchModal(true);
+                    setOpen(false); 
+                  }}
+                  className="sm:hidden md:flex items-center gap-3 w-full text-left px-5 py-3 text-sm font-medium hover:bg-blue-100 hover:text-blue-800 transition-colors"
+                >
+                  {item.icon}
+                  <span>{item.name}</span>
+                </button>
+              ) : (
+                <NavLink
+                  to={item.path}
+                  onClick={() => setOpen(false)}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-5 py-3 text-sm font-medium transition-colors
+            ${isActive
+                      ? "bg-gray-700 text-white"
+                      : "hover:bg-blue-100 hover:text-blue-800"}`
+                  }
+                >
+                  {item.icon}
+                  <span>{item.name}</span>
+                </NavLink>
+              )}
             </li>
           ))}
 
@@ -80,13 +98,14 @@ const handleLogout = () => {
           <li>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-3 w-full text-left px-5 py-3 text-sm  hover:bg-blue-100 hover:text-red-400 transition-colors"
+              className="flex items-center gap-3 w-full text-left px-5 py-3 text-sm hover:bg-blue-100 hover:text-red-400 transition-colors"
             >
               <LogOut size={20} />
               Logout
             </button>
           </li>
         </ul>
+
       </aside>
 
       {/* Overlay for mobile view */}
@@ -95,6 +114,11 @@ const handleLogout = () => {
           className="fixed inset-0 bg-gray-100 md:hidden z-30"
           onClick={() => setOpen(false)}
         ></div>
+      )}
+      {openSearchModal && (
+        <Page
+          onClose={() => setOpenSearchModal(false)}
+        />
       )}
     </>
   );
