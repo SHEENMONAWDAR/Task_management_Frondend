@@ -1,15 +1,55 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
+import API from "../../../api";
 import { CiCalendar } from "react-icons/ci";
 import { BASE_URL } from "../../../config";
 import proimg from "../../../assets/Profile.jpg";
+import Overview from "./Overview";
+import ProjectTeam from "./ProjectTeam";
+import Tasks from "./Tasks";
+import Analytics from "./Analytics";
+import { LuSquareCheckBig } from "react-icons/lu";
+import { FaRegFileAlt } from "react-icons/fa";
+import { GoPeople } from "react-icons/go";
+import { FiMessageSquare } from "react-icons/fi";
+import { SiSimpleanalytics } from "react-icons/si";
 
 const ProjectDetails = ({ project, onClose }) => {
-  if (!project) return null;
+  const [activeTab, setActiveTab] = useState("overview");
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const projectId = project.project_id;
+      setLoading(true);
+      try {
+        if (activeTab === "overview") {
+          const res = await API.get(`/tasks/project/${projectId}`);
+          setTasks(res.data || []);
+        }
+      }
+      catch (err) {
+        if (err.name !== "CanceledError") console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [project]);
+
+  if (!project || loading) {
+    return (
+      <div className="fixed inset-0 bg-black/60 flex items-center justify-center text-white text-lg font-medium z-50">
+        Loading project details...
+      </div>
+    );
+  }
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex justify-center items-center z-50 overflow-y-auto">
-      <div className="bg-white rounded-2xl shadow-lg p-6 relative animate-fadeIn my-10 w-[95%] md:w-[80%] lg:w-[60%] md-h-[80%] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/70 flex justify-center  z-50 overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-lg p-6 relative animate-fadeIn my-10 w-[80%] md:w-[45%] md-h-[80%] overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -20,17 +60,16 @@ const ProjectDetails = ({ project, onClose }) => {
 
         {/* Header */}
         <div
-          className={`border-l-4 pl-3 pb-2 ${
-            project.project_status === "inprogress"
+          className={`border-l-4 pl-3 pb-2 ${project.project_status === "inprogress"
               ? "border-yellow-500"
               : project.project_status === "completed"
-              ? "border-green-500"
-              : project.project_status === "planning"
-              ? "border-blue-500"
-              : project.project_status === "active"
-              ? "border-orange-400"
-              : "border-gray-300"
-          }`}
+                ? "border-green-500"
+                : project.project_status === "planning"
+                  ? "border-blue-500"
+                  : project.project_status === "active"
+                    ? "border-orange-400"
+                    : "border-gray-300"
+            }`}
         >
           <h1 className="font-bold text-2xl mb-1">{project.project_name}</h1>
           <p className="text-sm text-gray-600">
@@ -39,26 +78,24 @@ const ProjectDetails = ({ project, onClose }) => {
 
           <div className="flex flex-wrap gap-2 mt-3">
             <span
-              className={`text-xs font-semibold px-3 py-1 rounded-full capitalize ${
-                project.project_status === "completed"
+              className={`text-xs font-semibold px-3 py-1 rounded-full capitalize ${project.project_status === "completed"
                   ? "bg-green-100 text-green-700"
                   : project.project_status === "inprogress"
-                  ? "bg-yellow-100 text-yellow-700"
-                  : project.project_status === "active"
-                  ? "bg-orange-100 text-orange-700"
-                  : "bg-gray-100 text-gray-700"
-              }`}
+                    ? "bg-yellow-100 text-yellow-700"
+                    : project.project_status === "active"
+                      ? "bg-orange-100 text-orange-700"
+                      : "bg-gray-100 text-gray-700"
+                }`}
             >
               {project.project_status}
             </span>
             <span
-              className={`text-xs font-semibold px-3 py-1 rounded-full ${
-                project.project_priority === "High"
+              className={`text-xs font-semibold px-3 py-1 rounded-full ${project.project_priority === "High"
                   ? "bg-red-100 text-red-700"
                   : project.project_priority === "Medium"
-                  ? "bg-yellow-100 text-yellow-700"
-                  : "bg-green-100 text-green-700"
-              }`}
+                    ? "bg-yellow-100 text-yellow-700"
+                    : "bg-green-100 text-green-700"
+                }`}
             >
               {project.project_priority || "Normal"}
             </span>
@@ -70,10 +107,13 @@ const ProjectDetails = ({ project, onClose }) => {
           {/* Progress */}
           <div className="bg-gray-50 rounded-xl p-4">
             <span className="text-sm text-gray-600">Progress</span>
-            <div className="flex items-center justify-between">
-              <span className="font-semibold text-gray-800">
+            <div className="flex items-center">
+              <div className="font-bold text-2xl flex ">
                 {project.project_progress}%
-              </span>
+              </div>
+              <div className="text-sm text-gray-500">
+                {project.total_tasks} Tasks ({project.task_completed} Completed)
+              </div>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
               <div
@@ -102,21 +142,24 @@ const ProjectDetails = ({ project, onClose }) => {
                 project.users.slice(0, 4).map((user) => (
                   <img
                     key={user.id}
-                    src={user.image ? `${BASE_URL}/${user.image}` : proimg}
+                    src={user.image ? `${BASE_URL}/${user.image}` : ""}
                     className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
                     alt={user.name}
                   />
                 ))
               ) : (
-                <img
-                  src={proimg}
-                  className="w-10 h-10 rounded-full border-2 border-white shadow-sm"
-                  alt="Default"
-                />
+                <div className="flex flex-col items-center">
+                  <img
+                    src={proimg}
+                    className="w-10 h-10 object-cover rounded-full border-2 border-white shadow-sm"
+                    alt="Default"
+                  />
+                  <div className="text-sm mt-1">No team members</div>
+                </div>
               )}
             </div>
             <p className="text-sm text-gray-500">
-              {project.users?.length || 1} team member
+              {project.users?.length} team member
               {project.users?.length > 1 ? "s" : ""}
             </p>
           </div>
@@ -131,9 +174,9 @@ const ProjectDetails = ({ project, onClose }) => {
                   <strong>Start:</strong>{" "}
                   {project.project_start_date
                     ? new Date(project.project_start_date).toLocaleDateString(
-                        "en-US",
-                        { month: "short", day: "2-digit", year: "numeric" }
-                      )
+                      "en-US",
+                      { month: "short", day: "2-digit", year: "numeric" }
+                    )
                     : "N/A"}
                 </p>
               </div>
@@ -143,14 +186,71 @@ const ProjectDetails = ({ project, onClose }) => {
                   <strong>Deadline:</strong>{" "}
                   {project.project_due_date
                     ? new Date(project.project_due_date).toLocaleDateString(
-                        "en-US",
-                        { month: "short", day: "2-digit", year: "numeric" }
-                      )
+                      "en-US",
+                      { month: "short", day: "2-digit", year: "numeric" }
+                    )
                     : "N/A"}
                 </p>
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="bg-gray-200 w-full mt-7 p-2 flex gap-2 rounded-md ">
+          <button
+            className={`flex items-center cursor-pointer rounded-md gap-1 p-2 ${activeTab === "overview"
+                ? "bg-white text-black font-medium"
+                : "border-transparent text-gray-600 "
+              }`}
+            onClick={() => setActiveTab("overview")}
+          >
+            <FaRegFileAlt size={20} />Overview
+          </button>
+          <button
+            className={`flex items-center rounded-md cursor-pointer gap-1 p-2 ${activeTab === "tasks"
+                ? "bg-white text-black font-medium"
+                : "border-transparent text-gray-600 "
+              }`}
+            onClick={() => setActiveTab("tasks")}
+          >
+            <LuSquareCheckBig size={20} />Tasks
+          </button>
+          <button
+            className={`flex items-center rounded-md cursor-pointer gap-1 p-2 ${activeTab === "team"
+                ? "bg-white text-black font-medium"
+                : "border-transparent text-gray-600 "
+              }`}
+            onClick={() => setActiveTab("team")}
+          >
+            <GoPeople size={20} />Team
+          </button>
+          <button
+            className={`flex items-center rounded-md cursor-pointer gap-1 p-2 ${activeTab === "discussions"
+                ? "bg-white text-black font-medium"
+                : "border-transparent text-gray-600 "
+              }`}
+            onClick={() => setActiveTab("discussions")}
+          >
+            <FiMessageSquare size={20} />Discussions
+          </button>
+          <button
+            className={`flex items-center rounded-md cursor-pointer gap-1 p-2 ${activeTab === "analytics"
+                ? "bg-white text-black font-medium"
+                : "border-transparent text-gray-600 "
+              }`}
+            onClick={() => setActiveTab("analytics")}
+          >
+            <SiSimpleanalytics size={20} />Analytics
+          </button>
+        </div>
+
+        <div className="mt-3">
+          {activeTab === "overview" && <Overview project={project} tasks={tasks} />}
+          {activeTab === "tasks" && <Tasks tasks={tasks} />}
+          {activeTab === "team" && <ProjectTeam project={project} />}
+          {activeTab === "discussions" && <Tasks tasks={tasks} />}
+          {activeTab === "analytics" && <Analytics project={project} />}
         </div>
 
         {/* Footer */}

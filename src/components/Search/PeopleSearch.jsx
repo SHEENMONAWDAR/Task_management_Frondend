@@ -1,7 +1,7 @@
 import React from "react";
 import { BASE_URL } from "../../config";
 
-const PeopleSearch = ({ people = [] }) => {
+const PeopleSearch = ({ people }) => {
   if (!people.length) {
     return <div className="text-gray-500 text-sm ">No people found.</div>;
   }

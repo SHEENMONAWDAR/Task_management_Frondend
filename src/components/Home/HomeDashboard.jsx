@@ -18,6 +18,7 @@ const HomeDashboard = () => {
   const [projects, setProjects] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [taskstatus, setTaskstatus] = useState([])
+  const [monthlyData, setMonthlyData] = useState([]);
   const userId = localStorage.getItem('userid')
   const navigate = useNavigate();
 
@@ -40,6 +41,15 @@ const HomeDashboard = () => {
         console.error("Failed to fetch projects:", err);
       }
     };
+    const fetchMonthly = async () => {
+      try {
+        const res = await API.post(`/taskmonthlystatus/${userId}`, {});
+        setMonthlyData(res.data || []);
+      } catch (err) {
+        console.error("Error fetching monthly progress:", err);
+      }
+    };
+    fetchMonthly()
     fetchProjects();
     fetchtaskStatus();
   }, []);
@@ -214,7 +224,7 @@ const HomeDashboard = () => {
                         project.users.slice(0, 3).map((user) => (
                           <img
                             key={user.id}
-                            src={`${BASE_URL}/${user.image}` || proimg}
+                            src={`${BASE_URL}/${user.image}`}
                             className="w-10 h-10 rounded-full object-cover border-2 border-white"
                             alt={user.name}
                           />
@@ -249,63 +259,63 @@ const HomeDashboard = () => {
             </p>
           )}
         </div>
-<div className="px-6 py-6 grid grid-cols-12 gap-6">
-  {/* Chart Section */}
-  <div className="col-span-12 md:col-span-8 p-6 bg-white rounded-3xl shadow-lg">
-    <WaveProgressChart />
-  </div>
+        <div className="px-6 py-6 grid grid-cols-12 gap-6">
+          {/* Chart Section */}
+          <div className="col-span-12 md:col-span-8 p-6 bg-white rounded-3xl shadow-lg">
+            <WaveProgressChart monthlyData={monthlyData}/>
+          </div>
 
-  {/* Progress Circle Section */}
-  <div className="col-span-12 md:col-span-4 bg-white shadow-lg rounded-3xl p-6 flex flex-col justify-between">
-    {/* Header */}
-    <div className="mb- text-center md:text-left">
-      <h2 className="text-2xl font-bold text-gray-800">My Progress</h2>
-      <p className="text-gray-500 text-sm">Your task completion rate</p>
-    </div>
+          {/* Progress Circle Section */}
+          <div className="col-span-12 md:col-span-4 bg-white shadow-lg rounded-3xl p-6 flex flex-col justify-between">
+            {/* Header */}
+            <div className="mb- text-center md:text-left">
+              <h2 className="text-2xl font-bold text-gray-800">My Progress</h2>
+              <p className="text-gray-500 text-sm">Your task completion rate</p>
+            </div>
 
-    {/* Circle */}
-    <div className="flex justify-center my-4">
-      {taskstatus && taskstatus.length > 0 ? (
-        <CombinedProgressCircle
-          completed={parseFloat(taskstatus[0].completed_percentage)}
-          inProgress={parseFloat(taskstatus[0].inprogress_percentage)}
-          others={parseFloat(taskstatus[0].others_percentage)}
-        />
-      ) : (
-        <p className="text-gray-500">No task data</p>
-      )}
-    </div>
+            {/* Circle */}
+            <div className="flex justify-center my-4">
+              {taskstatus && taskstatus.length > 0 ? (
+                <CombinedProgressCircle
+                  completed={parseFloat(taskstatus[0].completed_percentage)}
+                  inProgress={parseFloat(taskstatus[0].inprogress_percentage)}
+                  others={parseFloat(taskstatus[0].others_percentage)}
+                />
+              ) : (
+                <p className="text-gray-500">No task data</p>
+              )}
+            </div>
 
-    {/* Percentages */}
-    {taskstatus && taskstatus.length > 0 && (
-      <div className="grid grid-cols-3 text-center gap-4">
-        {/* Completed */}
-        <div className="flex flex-col items-center">
-          <span className="text-2xl font-bold text-green-600">
-            {Math.round(parseFloat(taskstatus[0].completed_percentage))}%
-          </span>
-          <span className="text-green-400 font-medium">Completed</span>
+            {/* Percentages */}
+            {taskstatus && taskstatus.length > 0 && (
+              <div className="grid grid-cols-3 text-center gap-4">
+                {/* Completed */}
+                <div className="flex flex-col items-center">
+                  <span className="text-2xl font-bold text-green-600">
+                    {Math.round(parseFloat(taskstatus[0].completed_percentage))}%
+                  </span>
+                  <span className="text-green-400 font-medium">Completed</span>
+                </div>
+
+                {/* In Progress */}
+                <div className="flex flex-col items-center">
+                  <span className="text-2xl font-bold text-yellow-500">
+                    {Math.round(parseFloat(taskstatus[0].inprogress_percentage))}%
+                  </span>
+                  <span className="text-yellow-400 font-medium">In Progress</span>
+                </div>
+
+                {/* Others */}
+                <div className="flex flex-col items-center">
+                  <span className="text-2xl font-bold text-gray-500">
+                    {Math.round(parseFloat(taskstatus[0].others_percentage))}%
+                  </span>
+                  <span className="text-gray-400 font-medium">Others</span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-
-        {/* In Progress */}
-        <div className="flex flex-col items-center">
-          <span className="text-2xl font-bold text-yellow-500">
-            {Math.round(parseFloat(taskstatus[0].inprogress_percentage))}%
-          </span>
-          <span className="text-yellow-400 font-medium">In Progress</span>
-        </div>
-
-        {/* Others */}
-        <div className="flex flex-col items-center">
-          <span className="text-2xl font-bold text-gray-500">
-            {Math.round(parseFloat(taskstatus[0].others_percentage))}%
-          </span>
-          <span className="text-gray-400 font-medium">Others</span>
-        </div>
-      </div>
-    )}
-  </div>
-</div>
       </div>
     </div >
   );

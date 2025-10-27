@@ -9,9 +9,9 @@ import proimg from "../../assets/Profile.jpg";
 import { LuFileText } from "react-icons/lu";
 import { BASE_URL } from "../../config";
 import EditProjectFormModal from "./EditProjectFormModal";
-import userimg from '../../assets/Profile.jpg'
 import ProjectDetails from "./ProjectDetails/ProjectDetails";
-
+import { CiFilter } from "react-icons/ci";
+import { IoSearchOutline } from "react-icons/io5";
 
 const ProjectDashboard = () => {
     const [projects, setProjects] = useState([]);
@@ -20,28 +20,34 @@ const ProjectDashboard = () => {
     const [editingProject, setEditingProject] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
     const [openDetailsModal, setOpenDetailsModal] = useState(false);
-    const [details, setDetails] = useState(false);
+    const [details, setDetails] = useState(null);
+
+    // Search & Filter states
+    const [searchQuery, setSearchQuery] = useState("");
+    const [statusFilter, setStatusFilter] = useState("");
+
     const navigate = useNavigate();
-
-
 
     const fetchProjects = async () => {
         try {
-            const res = await API.get("/projects");
+            const res = await API.get("/projects", {
+                params: {
+                    q: searchQuery || undefined,
+                    status: statusFilter || undefined,
+                },
+            });
             setProjects(res.data || []);
-            console.log(res.data);
         } catch (err) {
             console.error("Failed to fetch projects:", err);
         }
     };
+
     useEffect(() => {
         fetchProjects();
         const handleClickOutside = () => setOpenMenuIndex(null);
         window.addEventListener("click", handleClickOutside);
         return () => window.removeEventListener("click", handleClickOutside);
-
-
-    }, []);
+    }, [searchQuery, statusFilter]);
 
     return (
         <>
@@ -61,10 +67,58 @@ const ProjectDashboard = () => {
 
                 {/* Main Section */}
                 <div className="flex-1 flex flex-col md:ml-64 transition-all space-y-3">
-                    <Header title="Project Dashboard" setSidebarOpen={setSidebarOpen} onProjectCreated={fetchProjects} />
+                    <Header
+                        title="Project Dashboard"
+                        setSidebarOpen={setSidebarOpen}
+                        onProjectCreated={fetchProjects}
+                    />
+
+                    {/* Search & Filter */}
+                    <div className="bg-white p-6 rounded-md shadow-md mt-15 flex flex-col md:flex-row gap-4">
+                        <div className="flex gap-2">
+                            <div className="relative w-full">
+                                <IoSearchOutline
+                                    size={20}
+                                    className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-500"
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="Search by project name..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full pl-10 pr-2 py-2 border border-gray-300 bg-slate-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                />
+                            </div>
+
+
+                            <div className="">
+                                <div className="relative w-full md:w-48">
+                                    <CiFilter
+                                        size={20}
+                                        className="absolute top-1/2 left-2 -translate-y-1/2 text-gray-500"
+                                    />
+                                    <select
+                                        value={statusFilter}
+                                        onChange={(e) => setStatusFilter(e.target.value)}
+                                        className="border border-gray-300 rounded-lg p-2 pl-8 w-full"
+                                    >
+                                        <option value="">All Projects</option>
+                                        <option value="on-hold">On-Hold</option>
+                                        <option value="inprogress">In Progress</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="cancelled">Cancelled</option>
+                                        <option value="active">Active</option>
+                                    </select>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                    </div>
 
                     {/* Project Cards */}
-                    <div className="px-8 py-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-15">
+                    <div className="px-8 py-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-1">
                         {projects.length > 0 ? (
                             projects.map((project, index) => (
                                 <div
@@ -117,16 +171,17 @@ const ProjectDashboard = () => {
                                         <div className="flex items-center space-x-2">
                                             <CiCalendar />
                                             <p>
-                                                Deadline: {project.project_due_date
-                                                    ? new Date(project.project_due_date).toLocaleDateString("en-US", {
-                                                        month: "short",
-                                                        day: "2-digit",
-                                                        year: "numeric"
-                                                    })
+                                                Deadline:{" "}
+                                                {project.project_due_date
+                                                    ? new Date(project.project_due_date).toLocaleDateString(
+                                                        "en-US",
+                                                        { month: "short", day: "2-digit", year: "numeric" }
+                                                    )
                                                     : "No due date"}
                                             </p>
-
                                         </div>
+
+                                        {/* Menu */}
                                         <div className="relative">
                                             <button
                                                 onClick={(e) => {
@@ -161,7 +216,9 @@ const ProjectDashboard = () => {
                                                         </li>
                                                         <li
                                                             className="px-4 py-2 text-red-600 hover:bg-red-50 cursor-pointer"
-                                                            onClick={() => alert(`Deleting project ${project.project_name}`)}
+                                                            onClick={() =>
+                                                                alert(`Deleting project ${project.project_name}`)
+                                                            }
                                                         >
                                                             Delete
                                                         </li>
@@ -169,7 +226,6 @@ const ProjectDashboard = () => {
                                                 </div>
                                             )}
                                         </div>
-
                                     </div>
 
                                     {/* Progress */}
@@ -191,8 +247,6 @@ const ProjectDashboard = () => {
                                         <h2 className="text-lg font-semibold text-gray-800 mb-2">
                                             Team Members
                                         </h2>
-
-
                                         <div className="flex justify-between items-center mt-3">
                                             <div className="flex -space-x-3">
                                                 {project.users && project.users.length > 0 ? (
@@ -205,14 +259,16 @@ const ProjectDashboard = () => {
                                                         />
                                                     ))
                                                 ) : (
-                                                    <img
-                                                        src={proimg}
-                                                        className="w-10 h-10 rounded-full border-2 border-white"
-                                                        alt="Default"
-                                                    />
+                                                    <div className="flex flex-col items-center">
+                                                        <img
+                                                            src={proimg}
+                                                            className="w-10 h-10 object-cover rounded-full border-2 border-white shadow-sm"
+                                                            alt="Default"
+                                                        />
+                                                        <div className="text-sm mt-1">No team members</div>
+                                                    </div>
                                                 )}
                                             </div>
-
                                             <div className="flex items-center text-gray-500">
                                                 <LuFileText className="mr-1" />
                                                 <p className="text-sm">
@@ -239,24 +295,19 @@ const ProjectDashboard = () => {
                                                     ? Number(project.project_budget).toLocaleString("en-US", {
                                                         style: "currency",
                                                         currency: "USD",
-                                                        minimumFractionDigits: 0
+                                                        minimumFractionDigits: 0,
                                                     })
                                                     : "N/A"}
                                             </p>
-
-
                                         </div>
                                         <div>
                                             <p className="text-gray-500">Start Date</p>
                                             <p>
                                                 {project.project_start_date
-                                                    ? new Date(
-                                                        project.project_start_date
-                                                    ).toLocaleDateString("en-US", {
-                                                        month: "short",
-                                                        day: "2-digit",
-                                                        year: "numeric"
-                                                    })
+                                                    ? new Date(project.project_start_date).toLocaleDateString(
+                                                        "en-US",
+                                                        { month: "short", day: "2-digit", year: "numeric" }
+                                                    )
                                                     : "N/A"}
                                             </p>
                                         </div>
@@ -286,6 +337,8 @@ const ProjectDashboard = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Modals */}
             {showEditModal && (
                 <EditProjectFormModal
                     project={editingProject}
@@ -300,7 +353,6 @@ const ProjectDashboard = () => {
                     onProjectUpdated={fetchProjects}
                 />
             )}
-
         </>
     );
 };

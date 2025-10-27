@@ -2,7 +2,7 @@ import React from "react";
 import { BASE_URL } from "../../config";
 import projimg from '../../assets/project.jpg'
 
-const ProjectsSearch = ({ projects = [] }) => {
+const ProjectsSearch = ({ projects }) => {
     if (!projects.length) {
         return <div className="text-gray-500 text-sm mt-2">No projects found.</div>;
     }

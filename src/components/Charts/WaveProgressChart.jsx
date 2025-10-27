@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -10,26 +10,10 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import API from "../../api";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
-export default function WaveProgressChart() {
-  const [monthlyData, setMonthlyData] = useState([]);
-  const userId = localStorage.getItem("userid");
-
-  useEffect(() => {
-    const fetchMonthly = async () => {
-      try {
-        const res = await API.post(`/taskmonthlystatus/${userId}`, {});
-        setMonthlyData(res.data || []);
-      } catch (error) {
-        console.error("Error fetching monthly progress:", error);
-      }
-    };
-    fetchMonthly();
-  }, [userId]);
-
+export default function WaveProgressChart({ monthlyData = [] }) {
   const months = monthlyData.map((m) => m.month);
 
   const data = {
@@ -123,7 +107,7 @@ export default function WaveProgressChart() {
     <div className="space-y-4">
       <div className="p-1 max-w-4xl mx-auto">
         <div className="mb-4">
-          <h2 className="text-2xl font-bold text-gray-800">My Tasks Analytics</h2>
+          <h2 className="text-2xl font-bold text-gray-800">Tasks Analytics</h2>
           <p className="text-gray-500 mt-1">Task completion and progress over time</p>
         </div>
 

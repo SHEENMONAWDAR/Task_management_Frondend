@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import API from "../../api";
 import { BASE_URL } from "../../config";
 import proimg from "../../assets/Profile.jpg";
-import EditTaskModal from "../Tasks/EditTaskModal"; // ✅ import edit modal
+import EditTaskModal from "../Tasks/EditTaskModal";
 import { LuFileText } from "react-icons/lu";
 import { FiMessageSquare } from "react-icons/fi";
 

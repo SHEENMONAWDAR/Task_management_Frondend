@@ -1,6 +1,6 @@
 import React from "react";
 
-const TasksSearch = ({ tasks = [] }) => {
+const TasksSearch = ({ tasks }) => {
   if (!tasks.length) {
     return (
       <div className="text-gray-500 text-sm mt-2">
