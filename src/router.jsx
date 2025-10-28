@@ -1,4 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
+
+import ProtectedLayout from "./components/ProtectedLayout";
+
 import Login from "./components/Login";
 import Register from "./components/Register";
 import AdminDashboard from "./components/Admin/AdminDashboard";
@@ -13,14 +16,22 @@ import NotFoundPage from "./components/NotFoundPage";
 const router = createBrowserRouter([
     { path: "/login", element: <Login /> },
     { path: "/register", element: <Register /> },
-    { path: "/admindashboard", element: <AdminDashboard /> },
-    { path: "/home", element: <HomeDashboard /> },
-    { path:"/createProject",element:<AddProjectFormModal/>},
-    { path:"/projectdashboard",element:<ProjectDashboard/>},
-    { path:"/contactspage",element:<ContactsPage/>}, 
-    { path:"/tasksdashboard",element:<TasksDashboard/>},
-    {path:"/kanbandashboard",element:<KanbanTasksDashboard/>},
-    {path:"*",element:<NotFoundPage/>},
+    {
+        element: <ProtectedLayout />,
+        children: [
+            { path: "/admindashboard", element: <AdminDashboard /> },
+            { path: "/home", element: <HomeDashboard /> },
+            { path: "/createProject", element: <AddProjectFormModal /> },
+            { path: "/projectdashboard", element: <ProjectDashboard /> },
+            { path: "/contactspage", element: <ContactsPage /> },
+            { path: "/tasksdashboard", element: <TasksDashboard /> },
+            { path: "/kanbandashboard", element: <KanbanTasksDashboard /> },
+            { path: "*", element: <NotFoundPage /> },
+        ]
+    }
+
+
+
 ])
 
 export default router;

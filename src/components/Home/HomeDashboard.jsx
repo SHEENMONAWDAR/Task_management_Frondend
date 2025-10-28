@@ -65,7 +65,7 @@ const HomeDashboard = () => {
   return (
     <div className="flex bg-gray-100 min-h-screen relative">
       {/* Sidebar (desktop) */}
-      <div className="hidden md:block fixed h-full w-64 bg-white shadow-md z-30">
+      <div className="hidden md:block fixed h-full w-64 bg-white shadow-md ">
         <Sidebar open={sidebarOpen} setOpen={setSidebarOpen} />
       </div>
 
